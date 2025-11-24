@@ -18,8 +18,13 @@
     "react-router-dom": "^7.9.6"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.5",
     "@types/node": "^22.14.0",
     "@vitejs/plugin-react": "^5.0.0",
+    "nodemon": "^3.1.11",
+    "prisma": "^6.19.0",
+    "ts-node": "^10.9.2",
     "typescript": "~5.8.2",
     "vite": "^6.2.0"
   }
