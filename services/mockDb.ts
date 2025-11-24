@@ -107,3 +107,14 @@ export const getMenuByCategory = (menu: MenuItem[]) => {
     return acc;
   }, {} as Record<string, MenuItem[]>);
 };
+
+export const getRestaurantBySlug = (slug: string): Restaurant | undefined => {
+  // For MVP, we only have one restaurant, so we ignore the slug but in real app we'd fetch by slug
+  // We'll just return the default restaurant if the slug matches our "demo" slug or just return it anyway for now
+  return getRestaurant();
+};
+
+export const getOrderByToken = (token: string): Order | undefined => {
+  const data = getRestaurant();
+  return data.orders.find(o => o.id === token);
+};
