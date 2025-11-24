@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Restaurant {
+  id        String     @id @default(uuid())
+  slug      String     @unique
+  name      String
+  createdAt DateTime   @default(now())
+  menu      MenuItem[]
+  orders    Order[]
+
+  @@map("restaurants")
+}
+
+model MenuItem {
+  id           String     @id @default(uuid())
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  name         String
+  description  String?
+  price        Float
+  category     String
+  imageUrl     String?
+  isVegetarian Boolean    @default(false)
+  isSpicy      Boolean    @default(false)
+  available    Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  orderItems   OrderItem[]
+
+  @@map("menu_items")
+}
+
+model Order {
+  id           String      @id @default(uuid())
+  restaurantId String
+  restaurant   Restaurant  @relation(fields: [restaurantId], references: [id])
+  tableNumber  Int
+  status       String      @default("PENDING") // PENDING, PREPARING, READY, COMPLETED, CANCELLED
+  total        Float
+  customerNote String?
+  createdAt    DateTime    @default(now())
+  items        OrderItem[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id         String   @id @default(uuid())
+  orderId    String
+  order      Order    @relation(fields: [orderId], references: [id])
+  menuItemId String
+  menuItem   MenuItem @relation(fields: [menuItemId], references: [id])
+  quantity   Int
+  priceAtTime Float
+
+  @@map("order_items")
+}

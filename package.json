@@ -6,11 +6,15 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "server": "tsx watch server/index.ts"
   },
   "dependencies": {
     "@google/genai": "^1.30.0",
+    "@prisma/client": "^6.19.0",
     "@supabase/supabase-js": "^2.84.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
     "framer-motion": "^12.23.24",
     "lucide-react": "^0.554.0",
     "react": "^19.2.0",
@@ -25,6 +29,7 @@
     "nodemon": "^3.1.11",
     "prisma": "^6.19.0",
     "ts-node": "^10.9.2",
+    "tsx": "^4.20.6",
     "typescript": "~5.8.2",
     "vite": "^6.2.0"
   }

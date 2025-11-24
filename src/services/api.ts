@@ -1,273 +1,201 @@
-import { supabase } from '../lib/supabase';
 import { MenuItem, Order, OrderStatus, Restaurant } from '../types';
 
-// --- Types mapping ---
-// We need to map between our frontend camelCase types and DB snake_case types
-
-interface DbRestaurant {
-    id: string;
-    slug: string;
-    name: string;
-    owner_id: string;
-}
-
-interface DbMenuItem {
-    id: string;
-    restaurant_id: string;
-    name: string;
-    description: string;
-    price: number;
-    category: string;
-    image_url: string;
-    is_vegetarian: boolean;
-    is_spicy: boolean;
-    available: boolean;
-}
-
-interface DbOrder {
-    id: string;
-    restaurant_id: string;
-    table_number: number;
-    status: OrderStatus;
-    total: number;
-    customer_note?: string;
-    created_at: string;
-}
-
-interface DbOrderItem {
-    id: string;
-    order_id: string;
-    menu_item_id: string;
-    quantity: number;
-    price_at_time: number;
-    menu_items: DbMenuItem; // Joined
-}
+const API_URL = 'http://localhost:3001/api';
 
 // --- API Methods ---
 
 export const api = {
     getRestaurantBySlug: async (slug: string): Promise<Restaurant | null> => {
-        const { data: restaurant, error } = await supabase
-            .from('restaurants')
-            .select('*')
-            .eq('slug', slug)
-            .single();
+        try {
+            const res = await fetch(`${API_URL}/restaurants/${slug}`);
+            if (!res.ok) return null;
 
-        if (error || !restaurant) {
-            console.error('Error fetching restaurant:', error);
+            const data = await res.json();
+
+            // Map backend data to frontend types
+            const menu: MenuItem[] = data.menu.map((item: any) => ({
+                id: item.id,
+                name: item.name,
+                description: item.description,
+                price: item.price,
+                category: item.category,
+                imageUrl: item.imageUrl,
+                isVegetarian: item.isVegetarian,
+                isSpicy: item.isSpicy,
+                available: item.available
+            }));
+
+            return {
+                id: data.id,
+                name: data.name,
+                menu,
+                orders: [], // Fetched separately
+                tables: 0
+            };
+        } catch (e) {
+            console.error(e);
             return null;
         }
-
-        const { data: menuItems, error: menuError } = await supabase
-            .from('menu_items')
-            .select('*')
-            .eq('restaurant_id', restaurant.id);
-
-        if (menuError) {
-            console.error('Error fetching menu:', menuError);
-            return null;
-        }
-
-        // Map to frontend types
-        const menu: MenuItem[] = (menuItems || []).map(item => ({
-            id: item.id,
-            name: item.name,
-            description: item.description,
-            price: item.price,
-            category: item.category,
-            imageUrl: item.image_url,
-            isVegetarian: item.is_vegetarian,
-            isSpicy: item.is_spicy,
-            available: item.available
-        }));
-
-        return {
-            id: restaurant.id,
-            name: restaurant.name,
-            menu,
-            orders: [], // We fetch orders separately or via subscription
-            tables: 0 // Not in DB yet
-        };
     },
 
     createOrder: async (order: Order, restaurantId: string): Promise<string | null> => {
-        // 1. Create Order
-        const { data: newOrder, error: orderError } = await supabase
-            .from('orders')
-            .insert({
-                restaurant_id: restaurantId,
-                table_number: order.tableNumber,
-                status: order.status,
-                total: order.total,
-                customer_note: order.customerNote
-            })
-            .select()
-            .single();
+        try {
+            const res = await fetch(`${API_URL}/orders`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    restaurantId,
+                    tableNumber: order.tableNumber,
+                    items: order.items,
+                    total: order.total,
+                    customerNote: order.customerNote
+                })
+            });
 
-        if (orderError || !newOrder) {
-            console.error('Error creating order:', orderError);
+            if (!res.ok) return null;
+            const data = await res.json();
+            return data.id;
+        } catch (e) {
+            console.error(e);
             return null;
         }
-
-        // 2. Create Order Items
-        const orderItems = order.items.map(item => ({
-            order_id: newOrder.id,
-            menu_item_id: item.id,
-            quantity: item.quantity,
-            price_at_time: item.price
-        }));
-
-        const { error: itemsError } = await supabase
-            .from('order_items')
-            .insert(orderItems);
-
-        if (itemsError) {
-            console.error('Error creating order items:', itemsError);
-            return null;
-        }
-
-        return newOrder.id;
     },
 
     getOrder: async (orderId: string): Promise<Order | null> => {
-        const { data: order, error } = await supabase
-            .from('orders')
-            .select(`
-        *,
-        order_items (
-          quantity,
-          menu_items (*)
-        )
-      `)
-            .eq('id', orderId)
-            .single();
+        try {
+            const res = await fetch(`${API_URL}/orders/${orderId}`);
+            if (!res.ok) return null;
 
-        if (error || !order) {
-            console.error('Error fetching order:', error);
+            const order = await res.json();
+
+            const items = order.items.map((oi: any) => ({
+                id: oi.menuItem.id,
+                name: oi.menuItem.name,
+                description: oi.menuItem.description,
+                price: oi.menuItem.price,
+                category: oi.menuItem.category,
+                imageUrl: oi.menuItem.imageUrl,
+                isVegetarian: oi.menuItem.isVegetarian,
+                isSpicy: oi.menuItem.isSpicy,
+                available: oi.menuItem.available,
+                quantity: oi.quantity
+            }));
+
+            return {
+                id: order.id,
+                tableNumber: order.tableNumber,
+                items,
+                total: order.total,
+                status: order.status as OrderStatus,
+                timestamp: new Date(order.createdAt).getTime(),
+                customerNote: order.customerNote
+            };
+        } catch (e) {
+            console.error(e);
             return null;
         }
-
-        // Map to frontend types
-        const items = order.order_items.map((oi: any) => ({
-            id: oi.menu_items.id,
-            name: oi.menu_items.name,
-            description: oi.menu_items.description,
-            price: oi.menu_items.price,
-            category: oi.menu_items.category,
-            imageUrl: oi.menu_items.image_url,
-            isVegetarian: oi.menu_items.is_vegetarian,
-            isSpicy: oi.menu_items.is_spicy,
-            available: oi.menu_items.available,
-            quantity: oi.quantity
-        }));
-
-        return {
-            id: order.id,
-            tableNumber: order.table_number,
-            items,
-            total: order.total,
-            status: order.status as OrderStatus,
-            timestamp: new Date(order.created_at).getTime(),
-            customerNote: order.customer_note
-        };
     },
 
     subscribeToOrder: (orderId: string, callback: (payload: any) => void) => {
-        return supabase
-            .channel(`order:${orderId}`)
-            .on(
-                'postgres_changes',
-                { event: 'UPDATE', schema: 'public', table: 'orders', filter: `id=eq.${orderId}` },
-                callback
-            )
-            .subscribe();
+        // Polling implementation for local DB
+        const interval = setInterval(async () => {
+            const order = await api.getOrder(orderId);
+            if (order) {
+                callback({ new: order });
+            }
+        }, 3000);
+
+        return {
+            unsubscribe: () => clearInterval(interval)
+        };
     },
 
     // --- Admin Methods ---
 
     getOrders: async (restaurantId: string): Promise<Order[]> => {
-        const { data: orders, error } = await supabase
-            .from('orders')
-            .select(`
-        *,
-        order_items (
-          quantity,
-          menu_items (*)
-        )
-      `)
-            .eq('restaurant_id', restaurantId)
-            .order('created_at', { ascending: false });
+        try {
+            const res = await fetch(`${API_URL}/orders?restaurantId=${restaurantId}`);
+            if (!res.ok) return [];
 
-        if (error || !orders) {
-            console.error('Error fetching orders:', error);
+            const orders = await res.json();
+
+            return orders.map((order: any) => ({
+                id: order.id,
+                tableNumber: order.tableNumber,
+                items: order.items.map((oi: any) => ({
+                    id: oi.menuItem.id,
+                    name: oi.menuItem.name,
+                    description: oi.menuItem.description,
+                    price: oi.menuItem.price,
+                    category: oi.menuItem.category,
+                    imageUrl: oi.menuItem.imageUrl,
+                    isVegetarian: oi.menuItem.isVegetarian,
+                    isSpicy: oi.menuItem.isSpicy,
+                    available: oi.menuItem.available,
+                    quantity: oi.quantity
+                })),
+                total: order.total,
+                status: order.status as OrderStatus,
+                timestamp: new Date(order.createdAt).getTime(),
+                customerNote: order.customerNote
+            }));
+        } catch (e) {
+            console.error(e);
             return [];
         }
-
-        return orders.map((order: any) => ({
-            id: order.id,
-            tableNumber: order.table_number,
-            items: order.order_items.map((oi: any) => ({
-                id: oi.menu_items.id,
-                name: oi.menu_items.name,
-                description: oi.menu_items.description,
-                price: oi.menu_items.price,
-                category: oi.menu_items.category,
-                imageUrl: oi.menu_items.image_url,
-                isVegetarian: oi.menu_items.is_vegetarian,
-                isSpicy: oi.menu_items.is_spicy,
-                available: oi.menu_items.available,
-                quantity: oi.quantity
-            })),
-            total: order.total,
-            status: order.status as OrderStatus,
-            timestamp: new Date(order.created_at).getTime(),
-            customerNote: order.customer_note
-        }));
     },
 
     updateOrderStatus: async (orderId: string, status: OrderStatus): Promise<boolean> => {
-        const { error } = await supabase
-            .from('orders')
-            .update({ status })
-            .eq('id', orderId);
-
-        if (error) {
-            console.error('Error updating order status:', error);
+        try {
+            const res = await fetch(`${API_URL}/orders/${orderId}/status`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status })
+            });
+            return res.ok;
+        } catch (e) {
+            console.error(e);
             return false;
         }
-        return true;
     },
 
     addMenuItem: async (item: MenuItem, restaurantId: string): Promise<boolean> => {
-        const { error } = await supabase
-            .from('menu_items')
-            .insert({
-                restaurant_id: restaurantId,
-                name: item.name,
-                description: item.description,
-                price: item.price,
-                category: item.category,
-                image_url: item.imageUrl,
-                is_vegetarian: item.isVegetarian,
-                is_spicy: item.isSpicy,
-                available: item.available
+        try {
+            const res = await fetch(`${API_URL}/menu-items`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    restaurantId,
+                    name: item.name,
+                    description: item.description,
+                    price: item.price,
+                    category: item.category,
+                    imageUrl: item.imageUrl,
+                    isVegetarian: item.isVegetarian,
+                    isSpicy: item.isSpicy,
+                    available: item.available
+                })
             });
-
-        if (error) {
-            console.error('Error adding menu item:', error);
+            return res.ok;
+        } catch (e) {
+            console.error(e);
             return false;
         }
-        return true;
     },
 
     subscribeToOrders: (restaurantId: string, callback: (payload: any) => void) => {
-        return supabase
-            .channel(`restaurant_orders:${restaurantId}`)
-            .on(
-                'postgres_changes',
-                { event: '*', schema: 'public', table: 'orders', filter: `restaurant_id=eq.${restaurantId}` },
-                callback
-            )
-            .subscribe();
+        // Polling implementation for local DB
+        // We can't easily detect INSERT vs UPDATE with simple polling without keeping state.
+        // For MVP, we'll just emit an 'INSERT' event periodically with the full list or just let the component re-fetch.
+        // Actually, the AdminDashboard re-fetches on INSERT.
+        // Let's just simulate an INSERT event every 5 seconds to force a refresh.
+
+        const interval = setInterval(() => {
+            callback({ eventType: 'INSERT' });
+        }, 5000);
+
+        return {
+            unsubscribe: () => clearInterval(interval)
+        };
     }
 };
