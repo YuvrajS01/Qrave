@@ -183,6 +183,29 @@ export const api = {
         }
     },
 
+    updateMenuItem: async (id: string, updates: Partial<MenuItem>): Promise<boolean> => {
+        try {
+            const res = await fetch(`${API_URL}/menu-items/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: updates.name,
+                    description: updates.description,
+                    price: updates.price,
+                    category: updates.category,
+                    imageUrl: updates.imageUrl,
+                    isVegetarian: updates.isVegetarian,
+                    isSpicy: updates.isSpicy,
+                    available: updates.available
+                })
+            });
+            return res.ok;
+        } catch (e) {
+            console.error(e);
+            return false;
+        }
+    },
+
     subscribeToOrders: (restaurantId: string, callback: (payload: any) => void) => {
         // Polling implementation for local DB
         // We can't easily detect INSERT vs UPDATE with simple polling without keeping state.

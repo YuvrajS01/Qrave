@@ -136,6 +136,24 @@ app.post('/api/menu-items', async (req, res) => {
     }
 });
 
+// Update Menu Item
+app.put('/api/menu-items/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { restaurantId, ...itemData } = req.body; // Exclude restaurantId if present, though it shouldn't change
+
+        const menuItem = await prisma.menuItem.update({
+            where: { id },
+            data: itemData
+        });
+
+        res.json(menuItem);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });

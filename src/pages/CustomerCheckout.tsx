@@ -46,37 +46,38 @@ export const CustomerCheckout = () => {
 
     return (
         <div className="min-h-screen bg-white flex flex-col">
-            <header className="px-6 py-4 border-b border-stone-100 flex items-center gap-4">
-                <button onClick={() => navigate(-1)} className="p-2 hover:bg-stone-50 rounded-full">
-                    <ArrowLeft size={24} />
+            <header className="px-4 md:px-6 py-4 border-b border-stone-100 flex items-center gap-4 sticky top-0 bg-white z-30">
+                <button onClick={() => navigate(-1)} className="p-2 -ml-2 hover:bg-stone-50 rounded-full transition-colors">
+                    <ArrowLeft size={24} className="text-qrave-dark" />
                 </button>
-                <h2 className="font-serif text-2xl font-bold">Checkout</h2>
+                <h2 className="font-serif text-xl md:text-2xl font-bold text-qrave-dark">Checkout</h2>
             </header>
 
-            <main className="flex-1 overflow-y-auto p-6">
-                <div className="space-y-6">
-                    <div className="bg-stone-50 rounded-2xl p-4 space-y-4">
+            <main className="flex-1 overflow-y-auto p-4 md:p-6">
+                <div className="max-w-2xl mx-auto space-y-6 md:space-y-8">
+                    <div className="bg-stone-50 rounded-2xl p-4 md:p-6 space-y-4">
+                        <h3 className="font-serif text-lg font-bold text-stone-600 mb-2">Order Summary</h3>
                         {cart.map(item => (
-                            <div key={item.id} className="flex justify-between items-center">
+                            <div key={item.id} className="flex justify-between items-center bg-white p-3 rounded-xl shadow-sm border border-stone-100">
                                 <div className="flex-1">
                                     <p className="font-serif text-lg leading-none mb-1">{item.name}</p>
                                     <p className="font-sans text-sm text-stone-400">${item.price}</p>
                                 </div>
-                                <div className="flex items-center gap-3 bg-white rounded-full px-2 py-1 shadow-sm">
-                                    <button onClick={() => removeFromCart(item.id)} className="p-1"><Minus size={14} /></button>
+                                <div className="flex items-center gap-3 bg-stone-50 rounded-full px-2 py-1">
+                                    <button onClick={() => removeFromCart(item.id)} className="p-1 hover:bg-stone-200 rounded-full transition-colors"><Minus size={14} /></button>
                                     <span className="font-sans font-medium w-4 text-center">{item.quantity}</span>
-                                    <button onClick={() => addToCart(item)} className="p-1"><Plus size={14} /></button>
+                                    <button onClick={() => addToCart(item)} className="p-1 hover:bg-stone-200 rounded-full transition-colors"><Plus size={14} /></button>
                                 </div>
                             </div>
                         ))}
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-stone-700 mb-2">Special Requests</label>
+                        <label className="block text-sm font-bold uppercase tracking-wider text-stone-400 mb-2 ml-1">Special Requests</label>
                         <textarea
-                            className="w-full p-3 bg-stone-50 rounded-xl border-none focus:ring-2 focus:ring-qrave-accent resize-none text-sm"
+                            className="w-full p-4 bg-stone-50 rounded-2xl border-none focus:ring-2 focus:ring-qrave-accent resize-none text-sm shadow-inner"
                             rows={3}
-                            placeholder="Allergic to peanuts? Extra spicy?"
+                            placeholder="Allergies, extra spicy, etc..."
                             value={customerNote}
                             onChange={(e) => setCustomerNote(e.target.value)}
                         />

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
-import { Clock, ChefHat, CheckCircle } from 'lucide-react';
+import { Clock, ChefHat, CheckCircle, ArrowLeft, UtensilsCrossed } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { api } from '../services/api';
 import * as db from '../../services/mockDb';
@@ -41,61 +41,71 @@ export const CustomerTracking = () => {
 
     if (!activeOrder) return <div>Loading Order...</div>;
 
-    const steps = [
-        { status: OrderStatus.PENDING, label: "Order Sent", icon: Clock },
-        { status: OrderStatus.PREPARING, label: "Kitchen Preparing", icon: ChefHat },
-        { status: OrderStatus.READY, label: "Ready to Serve", icon: CheckCircle },
-    ];
-
-    const isCompleted = activeOrder.status === OrderStatus.COMPLETED;
-
     return (
-        <div className="min-h-screen bg-qrave-dark text-white p-6 flex flex-col items-center justify-center relative overflow-hidden">
-            {/* Background Animation */}
-            <div className="absolute inset-0 opacity-20">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-orange-600 blur-[120px] rounded-full animate-pulse" />
-            </div>
+        <div className="min-h-screen bg-white flex flex-col">
+            <header className="px-4 md:px-6 py-4 border-b border-stone-100 flex items-center gap-4 sticky top-0 bg-white z-30">
+                <button onClick={() => navigate(`/r/${slug}?table=${tableNumber}`)} className="p-2 -ml-2 hover:bg-stone-50 rounded-full transition-colors">
+                    <ArrowLeft size={24} className="text-qrave-dark" />
+                </button>
+                <h2 className="font-serif text-xl md:text-2xl font-bold text-qrave-dark">Order Status</h2>
+            </header>
 
-            <div className="relative z-10 w-full max-w-md">
-                <div className="text-center mb-12">
-                    <h2 className="font-serif text-4xl mb-2">Order #{activeOrder.id.slice(-4)}</h2>
-                    <p className="text-stone-400 font-sans">Table {tableNumber}</p>
-                </div>
-
-                <div className="space-y-8 relative pl-8 border-l-2 border-stone-800 ml-4">
-                    {steps.map((step, idx) => {
-                        const isActive = activeOrder.status === step.status;
-                        const isPast = steps.findIndex(s => s.status === activeOrder.status) > idx || isCompleted;
-                        const Icon = step.icon;
-
-                        return (
-                            <div key={idx} className={`relative transition-all duration-500 ${isActive || isPast ? 'opacity-100' : 'opacity-30'}`}>
-                                <div className={`absolute -left-[41px] top-0 w-5 h-5 rounded-full border-4 border-qrave-dark ${isActive || isPast ? 'bg-orange-500' : 'bg-stone-800'}`} />
-                                <div className="flex items-center gap-4">
-                                    <div className={`p-3 rounded-xl ${isActive ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30' : 'bg-stone-800 text-stone-400'}`}>
-                                        <Icon size={24} />
-                                    </div>
-                                    <div>
-                                        <h3 className="font-serif text-xl">{step.label}</h3>
-                                        {isActive && <p className="text-sm text-orange-400 animate-pulse">In progress...</p>}
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
-
-                <div className="mt-16 text-center">
-                    {isCompleted ? (
-                        <div className="bg-green-500/20 text-green-400 p-4 rounded-xl border border-green-500/50">
-                            <p className="font-medium">Order Completed. Enjoy your meal!</p>
-                            <Button variant="ghost" className="mt-4 text-white hover:text-white hover:bg-white/10" onClick={() => navigate(`/r/${slug}?table=${tableNumber}`)}>Order More</Button>
+            <main className="flex-1 overflow-y-auto p-4 md:p-6">
+                <div className="max-w-xl mx-auto space-y-8">
+                    <div className="text-center space-y-2">
+                        <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <Clock size={40} className="text-green-600" />
                         </div>
-                    ) : (
-                        <p className="text-stone-500 text-sm italic">Keep this screen open to track your order.</p>
-                    )}
+                        <h3 className="font-serif text-2xl font-bold text-qrave-dark">
+                            {activeOrder.status === OrderStatus.PENDING && "Order Sent!"}
+                            {activeOrder.status === OrderStatus.PREPARING && "Cooking..."}
+                            {activeOrder.status === OrderStatus.READY && "Ready to Serve!"}
+                            {activeOrder.status === OrderStatus.COMPLETED && "Enjoy!"}
+                        </h3>
+                        <p className="text-stone-500">Order #{activeOrder.id.slice(-4)}</p>
+                    </div>
+
+                    <div className="bg-stone-50 rounded-2xl p-6 space-y-6">
+                        <div className="flex items-center gap-4">
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${activeOrder.status === OrderStatus.PENDING ? 'bg-orange-500 text-white' : 'bg-green-500 text-white'}`}>
+                                <CheckCircle size={16} />
+                            </div>
+                            <div className="flex-1">
+                                <p className="font-bold text-qrave-dark">Order Received</p>
+                                <p className="text-xs text-stone-400">We've got your order</p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${activeOrder.status === OrderStatus.PREPARING || activeOrder.status === OrderStatus.READY || activeOrder.status === OrderStatus.COMPLETED
+                                    ? 'bg-orange-500 text-white'
+                                    : 'bg-stone-200 text-stone-400'
+                                }`}>
+                                <ChefHat size={16} />
+                            </div>
+                            <div className="flex-1">
+                                <p className={`font-bold ${activeOrder.status === OrderStatus.PENDING ? 'text-stone-400' : 'text-qrave-dark'}`}>Preparing</p>
+                                <p className="text-xs text-stone-400">Chef is working on it</p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${activeOrder.status === OrderStatus.READY || activeOrder.status === OrderStatus.COMPLETED
+                                    ? 'bg-green-500 text-white'
+                                    : 'bg-stone-200 text-stone-400'
+                                }`}>
+                                <UtensilsCrossed size={16} />
+                            </div>
+                            <div className="flex-1">
+                                <p className={`font-bold ${activeOrder.status === OrderStatus.READY || activeOrder.status === OrderStatus.COMPLETED ? 'text-qrave-dark' : 'text-stone-400'}`}>Ready to Serve</p>
+                                <p className="text-xs text-stone-400">Coming to your table</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <Button onClick={() => navigate(`/r/${slug}?table=${tableNumber}`)} variant="secondary" className="w-full py-4">
+                        Order More Items
+                    </Button>
                 </div>
-            </div>
+            </main>
         </div>
     );
 };
