@@ -49,7 +49,7 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order, onStatusChange }) =
         {order.items.map((item, idx) => (
           <div key={idx} className="flex justify-between text-sm font-sans">
             <span className="text-stone-700"><span className="font-bold text-qrave-dark">{item.quantity}x</span> {item.name}</span>
-            <span className="text-stone-400 font-mono">${(item.price * item.quantity).toFixed(0)}</span>
+            <span className="text-stone-400 font-mono">₹{(item.price * item.quantity).toFixed(0)}</span>
           </div>
         ))}
       </div>
@@ -60,9 +60,12 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order, onStatusChange }) =
         </div>
       )}
 
-      <div className="flex justify-between items-center pt-1">
-        <span className="font-sans font-bold text-lg">${order.total.toFixed(2)}</span>
+      <div className="mt-4 pt-4 border-t border-stone-100 flex justify-between items-center">
+        <span className="text-stone-500 text-sm font-medium">Total Amount</span>
+        <span className="font-sans font-bold text-lg">₹{order.total.toFixed(2)}</span>
+      </div>
 
+      <div className="flex justify-end items-center">
         <div className="flex gap-2">
           {order.status !== OrderStatus.COMPLETED && order.status !== OrderStatus.CANCELLED && (
             <>

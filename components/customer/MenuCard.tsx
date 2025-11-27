@@ -40,7 +40,7 @@ export const MenuCard: React.FC<MenuCardProps> = ({ item, onAdd, index }) => {
         </div>
 
         <div className="flex items-center justify-between mt-3">
-          <span className="font-sans font-medium text-qrave-dark">${item.price}</span>
+          <span className="font-sans font-medium text-qrave-dark">₹{item.price}</span>
           <button
             onClick={() => onAdd(item)}
             className="w-8 h-8 rounded-full bg-stone-100 text-qrave-dark flex items-center justify-center hover:bg-qrave-dark hover:text-white transition-colors"

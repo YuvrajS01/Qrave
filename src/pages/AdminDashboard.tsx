@@ -235,7 +235,7 @@ export const AdminDashboard = () => {
                                             <div className="flex justify-between">
                                                 <h4 className="font-bold font-serif text-lg">{item.name}</h4>
                                                 <div className="flex items-center gap-4">
-                                                    <span className="font-mono text-stone-500">${item.price}</span>
+                                                    <span className="font-mono text-stone-500">₹{item.price}</span>
                                                     <button
                                                         onClick={() => setEditingItem(item)}
                                                         className="p-2 hover:bg-stone-100 rounded-full text-stone-400 hover:text-qrave-dark transition-colors"

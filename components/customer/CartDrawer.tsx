@@ -34,7 +34,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ items, onCheckout }) => 
               </div>
               <div className="text-left">
                 <p className="text-xs text-stone-300 font-sans uppercase tracking-wider">Total</p>
-                <p className="font-sans font-bold text-lg leading-none">${totalPrice.toFixed(2)}</p>
+                <p className="font-sans font-bold text-lg leading-none">₹{totalPrice.toFixed(2)}</p>
               </div>
             </div>
 

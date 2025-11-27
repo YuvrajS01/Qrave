@@ -61,7 +61,7 @@ export const CustomerCheckout = () => {
                             <div key={item.id} className="flex justify-between items-center bg-white p-3 rounded-xl shadow-sm border border-stone-100">
                                 <div className="flex-1">
                                     <p className="font-serif text-lg leading-none mb-1">{item.name}</p>
-                                    <p className="font-sans text-sm text-stone-400">${item.price}</p>
+                                    <p className="font-sans text-sm text-stone-400">₹{item.price}</p>
                                 </div>
                                 <div className="flex items-center gap-3 bg-stone-50 rounded-full px-2 py-1">
                                     <button onClick={() => removeFromCart(item.id)} className="p-1 hover:bg-stone-200 rounded-full transition-colors"><Minus size={14} /></button>
@@ -86,15 +86,15 @@ export const CustomerCheckout = () => {
                     <div className="border-t border-dashed border-stone-200 pt-4 space-y-2">
                         <div className="flex justify-between text-stone-500 font-sans">
                             <span>Subtotal</span>
-                            <span>${total.toFixed(2)}</span>
+                            <span>₹{total.toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between text-stone-500 font-sans">
-                            <span>Taxes (10%)</span>
-                            <span>${(total * 0.1).toFixed(2)}</span>
+                            <span>GST (5%)</span>
+                            <span>₹{(total * 0.05).toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between text-2xl font-serif font-bold text-qrave-dark pt-2">
                             <span>Total</span>
-                            <span>${(total * 1.1).toFixed(2)}</span>
+                            <span>₹{(total * 1.05).toFixed(2)}</span>
                         </div>
                     </div>
                 </div>
@@ -104,7 +104,7 @@ export const CustomerCheckout = () => {
                 <Button onClick={placeOrder} size="lg" className="w-full flex items-center justify-between group">
                     <span>Pay with Razorpay</span>
                     <div className="flex items-center gap-2">
-                        <span className="font-mono text-white/80">${(total * 1.1).toFixed(2)}</span>
+                        <span className="font-mono text-white/80">₹{(total * 1.05).toFixed(2)}</span>
                         <CreditCard size={20} className="group-hover:translate-x-1 transition-transform" />
                     </div>
                 </Button>

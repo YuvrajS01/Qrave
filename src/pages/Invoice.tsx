@@ -22,8 +22,8 @@ export const Invoice = () => {
 
     if (!order) return <div className="p-8 text-center">Loading Invoice...</div>;
 
-    const subtotal = order.total;
-    const tax = subtotal * 0.10; // 10% tax
+    const subtotal = order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const tax = subtotal * 0.05;
     const total = subtotal + tax;
 
     return (
@@ -48,11 +48,11 @@ export const Invoice = () => {
                                 <Receipt size={24} />
                                 <span className="font-serif text-2xl font-bold tracking-tight">Qrave</span>
                             </div>
-                            <p className="text-stone-500 text-sm">123 Culinary Avenue</p>
-                            <p className="text-stone-500 text-sm">Food City, FC 90210</p>
+                            <p className="text-stone-500 text-sm">123 Food Street, Indiranagar</p>
+                            <p className="text-stone-500 text-sm">Bangalore, KA 560038</p>
                         </div>
                         <div className="text-right">
-                            <h2 className="text-4xl font-serif font-bold text-stone-200 mb-2">INVOICE</h2>
+                            <h2 className="text-4xl font-serif font-bold text-grey-200 mb-2">INVOICE</h2>
                             <p className="text-stone-500 font-mono text-sm">#{order.id.slice(0, 8).toUpperCase()}</p>
                             <p className="text-stone-500 text-sm">{new Date(order.timestamp).toLocaleDateString()}</p>
                         </div>
@@ -78,8 +78,8 @@ export const Invoice = () => {
                                 <tr key={item.id}>
                                     <td className="py-4 font-medium text-qrave-dark">{item.name}</td>
                                     <td className="py-4 text-center text-stone-500">{item.quantity}</td>
-                                    <td className="py-4 text-right text-stone-500">${item.price.toFixed(2)}</td>
-                                    <td className="py-4 text-right font-bold text-stone-700">${(item.price * item.quantity).toFixed(2)}</td>
+                                    <td className="py-4 text-right text-stone-500">₹{item.price.toFixed(2)}</td>
+                                    <td className="py-4 text-right font-bold text-stone-700">₹{(item.price * item.quantity).toFixed(2)}</td>
                                 </tr>
                             ))}
                         </tbody>
@@ -89,15 +89,15 @@ export const Invoice = () => {
                         <div className="w-64 space-y-3">
                             <div className="flex justify-between text-stone-500">
                                 <span>Subtotal</span>
-                                <span>${subtotal.toFixed(2)}</span>
+                                <span>₹{subtotal.toFixed(2)}</span>
                             </div>
                             <div className="flex justify-between text-stone-500">
-                                <span>Tax (10%)</span>
-                                <span>${tax.toFixed(2)}</span>
+                                <span>GST (5%)</span>
+                                <span>₹{tax.toFixed(2)}</span>
                             </div>
                             <div className="flex justify-between text-xl font-bold text-qrave-dark pt-4 border-t-2 border-stone-100">
                                 <span>Total</span>
-                                <span>${total.toFixed(2)}</span>
+                                <span>₹{total.toFixed(2)}</span>
                             </div>
                         </div>
                     </div>
