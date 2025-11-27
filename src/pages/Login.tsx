@@ -19,6 +19,7 @@ export const Login = () => {
         try {
             const restaurant = await api.login(slug, password);
             if (restaurant) {
+                localStorage.setItem('qrave_user', JSON.stringify(restaurant));
                 navigate(`/admin/${restaurant.slug}`);
             }
         } catch (err) {

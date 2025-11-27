@@ -12,10 +12,15 @@
   "dependencies": {
     "@prisma/client": "^6.19.0",
     "@supabase/supabase-js": "^2.84.0",
+    "@types/file-saver": "^2.0.7",
     "cors": "^2.8.5",
     "express": "^5.1.0",
+    "file-saver": "^2.0.5",
     "framer-motion": "^12.23.24",
+    "html5-qrcode": "^2.3.8",
+    "jszip": "^3.10.1",
     "lucide-react": "^0.554.0",
+    "qrcode.react": "^4.2.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.9.6"

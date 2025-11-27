@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; // Trigger HMR
 import { useNavigate, useParams } from 'react-router-dom';
 import {
     ChefHat,
@@ -8,22 +8,26 @@ import {
     Clock,
 
     Edit2,
-    X
+    X,
+    QrCode,
+    Menu
 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { OrderCard } from '../../components/admin/OrderCard';
+import { QRGenerator } from '../../components/admin/QRGenerator';
 import { api } from '../services/api';
 import * as db from '../services/mockDb';
 
 import { Restaurant, OrderStatus, MenuItem } from '../types';
 
-type AdminView = 'DASHBOARD' | 'MENU';
+type AdminView = 'DASHBOARD' | 'MENU' | 'QR_CODES';
 
 export const AdminDashboard = () => {
     const navigate = useNavigate();
     const { slug } = useParams<{ slug: string }>();
     const [view, setView] = useState<AdminView>('DASHBOARD');
     const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
     // Admin State
 
@@ -134,7 +138,7 @@ export const AdminDashboard = () => {
     return (
         <div className="min-h-screen bg-stone-50 flex">
             {/* Sidebar */}
-            <aside className="w-64 bg-qrave-dark text-white p-6 hidden md:flex flex-col justify-between">
+            <aside className={`${isSidebarOpen ? 'w-64 p-6' : 'w-0 p-0 overflow-hidden'} bg-qrave-dark text-white transition-all duration-300 flex flex-col justify-between whitespace-nowrap`}>
                 <div>
                     <div className="flex items-center gap-3 mb-10">
                         <div className="w-8 h-8 bg-orange-600 rounded-lg flex items-center justify-center">
@@ -157,6 +161,13 @@ export const AdminDashboard = () => {
                             <UtensilsCrossed size={20} />
                             <span className="font-sans text-sm font-medium">Menu Manager</span>
                         </button>
+                        <button
+                            onClick={() => setView('QR_CODES')}
+                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${view === 'QR_CODES' ? 'bg-white/10 text-white' : 'text-stone-400 hover:text-white'}`}
+                        >
+                            <QrCode size={20} />
+                            <span className="font-sans text-sm font-medium">QR Codes</span>
+                        </button>
                     </nav>
                 </div>
                 <button
@@ -171,9 +182,14 @@ export const AdminDashboard = () => {
             {/* Main Content */}
             <main className="flex-1 overflow-y-auto">
                 <header className="bg-white border-b border-stone-200 px-8 py-5 flex justify-between items-center sticky top-0 z-30">
-                    <h2 className="font-serif text-2xl font-bold text-qrave-dark">
-                        {view === 'DASHBOARD' ? 'Kitchen Display System' : 'Menu Management'}
-                    </h2>
+                    <div className="flex items-center gap-4">
+                        <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-2 hover:bg-stone-100 rounded-lg transition-colors">
+                            <Menu size={20} className="text-stone-500" />
+                        </button>
+                        <h2 className="font-serif text-2xl font-bold text-qrave-dark">
+                            {view === 'DASHBOARD' ? 'Kitchen Display System' : view === 'MENU' ? 'Menu Management' : 'QR Code Generator'}
+                        </h2>
+                    </div>
                     <div className="flex items-center gap-4">
                         {view === 'DASHBOARD' && (
                             <Button variant="secondary" size="sm" onClick={handleClearCompleted} className="text-xs">
@@ -204,9 +220,7 @@ export const AdminDashboard = () => {
                                 ))
                             )}
                         </div>
-                    ) : (
-
-
+                    ) : view === 'MENU' ? (
                         <div className="space-y-4">
                             {restaurant?.menu.slice().reverse().map(item => (
                                 <div key={item.id} className="flex gap-4 bg-white p-4 rounded-xl border border-stone-200 items-center">
@@ -233,7 +247,8 @@ export const AdminDashboard = () => {
                                 </div>
                             ))}
                         </div>
-
+                    ) : (
+                        <QRGenerator slug={slug || ''} />
                     )}
                 </div>
             </main >

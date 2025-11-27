@@ -1,17 +1,57 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ScanLine } from 'lucide-react';
+import { ScanLine, QrCode } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '../../components/ui/Button';
+import { QRScanner } from '../../components/QRScanner';
 
 export const Landing = () => {
     const [table, setTable] = useState('5');
+    const [showScanner, setShowScanner] = useState(false);
     const navigate = useNavigate();
 
     const handleStart = () => {
         // In a real app, we might validate the table or restaurant slug here.
         // For now, we assume a default restaurant slug "demo-restaurant".
         navigate(`/r/demo-restaurant?table=${table}`);
+    };
+
+    const handleScan = (decodedText: string) => {
+        try {
+            // Attempt to parse as URL
+            const url = new URL(decodedText);
+            if (url.pathname.startsWith('/r/')) {
+                // Extract slug and params
+                const pathParts = url.pathname.split('/');
+                const slug = pathParts[2];
+                const params = new URLSearchParams(url.search);
+                const scannedTable = params.get('table');
+
+                if (slug) {
+                    navigate(`/r/${slug}${scannedTable ? `?table=${scannedTable}` : ''}`);
+                    setShowScanner(false);
+                    return;
+                }
+            }
+        } catch (e) {
+            // Not a URL, maybe a JSON object?
+            try {
+                const data = JSON.parse(decodedText);
+                if (data.slug) {
+                    navigate(`/r/${data.slug}${data.table ? `?table=${data.table}` : ''}`);
+                    setShowScanner(false);
+                    return;
+                }
+            } catch (jsonErr) {
+                console.error("Failed to parse QR code", jsonErr);
+            }
+        }
+
+        // Fallback or error handling could go here
+        // For now, we'll just alert or log
+        console.log("Scanned:", decodedText);
+        // Optional: Show an error toast
+        setShowScanner(false);
     };
 
     return (
@@ -33,12 +73,21 @@ export const Landing = () => {
 
                 <div className="bg-white p-6 rounded-3xl shadow-xl shadow-stone-200/50 mb-8 border border-white">
                     <label className="block text-xs font-bold text-stone-400 uppercase tracking-widest mb-2">Table Number</label>
-                    <input
-                        type="number"
-                        value={table}
-                        onChange={(e) => setTable(e.target.value)}
-                        className="w-full text-center text-4xl font-serif font-bold text-qrave-dark border-b-2 border-stone-100 focus:border-qrave-accent focus:outline-none py-2 bg-transparent"
-                    />
+                    <div className="flex items-center gap-3">
+                        <input
+                            type="number"
+                            value={table}
+                            onChange={(e) => setTable(e.target.value)}
+                            className="w-full text-center text-4xl font-serif font-bold text-qrave-dark border-b-2 border-stone-100 focus:border-qrave-accent focus:outline-none py-2 bg-transparent"
+                        />
+                        <button
+                            onClick={() => setShowScanner(true)}
+                            className="p-3 bg-stone-100 hover:bg-stone-200 rounded-xl text-stone-600 transition-colors"
+                            title="Scan QR Code"
+                        >
+                            <QrCode size={24} />
+                        </button>
+                    </div>
                 </div>
 
                 <Button onClick={handleStart} size="lg" variant="secondary" className="w-full">
@@ -50,6 +99,13 @@ export const Landing = () => {
                     <span className="underline cursor-pointer hover:text-qrave-dark transition-colors" onClick={() => navigate('/login')}>Login to Dashboard</span>
                 </p>
             </motion.div>
+
+            {showScanner && (
+                <QRScanner
+                    onScanSuccess={handleScan}
+                    onClose={() => setShowScanner(false)}
+                />
+            )}
         </div>
     );
 };

@@ -9,6 +9,7 @@ import { Login } from './src/pages/Login';
 import { AdminDashboard } from './src/pages/AdminDashboard';
 import { SuperAdmin } from './src/pages/SuperAdmin';
 import { Invoice } from './src/pages/Invoice';
+import { ProtectedRoute } from './components/ProtectedRoute';
 
 const App: React.FC = () => {
   return (
@@ -21,7 +22,11 @@ const App: React.FC = () => {
           <Route path="/r/:slug/orders/:orderId" element={<CustomerTracking />} />
           <Route path="/r/:slug/orders/:orderId/invoice" element={<Invoice />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/admin/:slug" element={<AdminDashboard />} />
+          <Route path="/admin/:slug" element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          } />
           <Route path="/super-admin" element={<SuperAdmin />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
