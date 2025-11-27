@@ -17,6 +17,13 @@ export const Login = () => {
         setIsLoading(true);
 
         try {
+            // Hardcoded Superadmin Login
+            if (slug === 'superadmin' && password === 'admin123') {
+                localStorage.setItem('qrave_superadmin', 'true');
+                navigate('/super-admin');
+                return;
+            }
+
             const restaurant = await api.login(slug, password);
             if (restaurant) {
                 localStorage.setItem('qrave_user', JSON.stringify(restaurant));

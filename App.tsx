@@ -10,6 +10,7 @@ import { AdminDashboard } from './src/pages/AdminDashboard';
 import { SuperAdmin } from './src/pages/SuperAdmin';
 import { Invoice } from './src/pages/Invoice';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { SuperAdminProtectedRoute } from './components/SuperAdminProtectedRoute';
 
 const App: React.FC = () => {
   return (
@@ -27,7 +28,11 @@ const App: React.FC = () => {
               <AdminDashboard />
             </ProtectedRoute>
           } />
-          <Route path="/super-admin" element={<SuperAdmin />} />
+          <Route path="/super-admin" element={
+            <SuperAdminProtectedRoute>
+              <SuperAdmin />
+            </SuperAdminProtectedRoute>
+          } />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>

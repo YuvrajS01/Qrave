@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Trash2, ExternalLink, Utensils } from 'lucide-react';
+import { Plus, Trash2, ExternalLink, Utensils, LogOut } from 'lucide-react';
 import { api } from '../services/api';
 import { Button } from '../../components/ui/Button';
 
@@ -53,6 +53,11 @@ export const SuperAdmin = () => {
         }
     };
 
+    const handleLogout = () => {
+        localStorage.removeItem('qrave_superadmin');
+        navigate('/login');
+    };
+
     return (
         <div className="min-h-screen bg-stone-50 p-8">
             <div className="max-w-5xl mx-auto">
@@ -61,9 +66,14 @@ export const SuperAdmin = () => {
                         <h1 className="font-serif text-4xl font-bold text-qrave-dark mb-2">Super Admin</h1>
                         <p className="text-stone-500">Manage all restaurants on the platform</p>
                     </div>
-                    <Button onClick={() => setIsCreating(true)} className="flex items-center gap-2">
-                        <Plus size={20} /> Add Restaurant
-                    </Button>
+                    <div className="flex gap-3">
+                        <Button onClick={() => setIsCreating(true)} className="flex items-center gap-2">
+                            <Plus size={20} /> Add Restaurant
+                        </Button>
+                        <Button variant="secondary" onClick={handleLogout} className="flex items-center gap-2">
+                            <LogOut size={20} /> Logout
+                        </Button>
+                    </div>
                 </header>
 
                 {isCreating && (
