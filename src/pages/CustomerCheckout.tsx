@@ -4,8 +4,8 @@ import { ArrowLeft, Minus, Plus, CreditCard } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { useCart } from '../context/CartContext';
 import { api } from '../services/api';
-import * as db from '../../services/mockDb';
-import { Order, OrderStatus } from '../../types';
+import * as db from '../services/mockDb';
+import { Order, OrderStatus } from '../types';
 
 export const CustomerCheckout = () => {
     const { slug } = useParams();
@@ -38,7 +38,7 @@ export const CustomerCheckout = () => {
         const orderId = await api.createOrder(newOrder, restaurant.id);
         if (orderId) {
             clearCart();
-            navigate(`/r/${slug}/order/${orderId}?table=${tableNumber}`);
+            navigate(`/r/${slug}/orders/${orderId}?table=${tableNumber}`);
         }
     };
 

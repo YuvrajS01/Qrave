@@ -1,5 +1,5 @@
 import React from 'react';
-import { CartItem } from '../../types';
+import { CartItem } from '../../src/types';
 import { ShoppingBag, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -15,13 +15,13 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ items, onCheckout }) => 
   return (
     <AnimatePresence>
       {totalItems > 0 && (
-        <motion.div 
+        <motion.div
           initial={{ y: 100 }}
           animate={{ y: 0 }}
           exit={{ y: 100 }}
           className="fixed bottom-6 left-4 right-4 z-50 max-w-md mx-auto"
         >
-          <button 
+          <button
             onClick={onCheckout}
             className="w-full bg-qrave-dark text-white p-4 rounded-2xl shadow-2xl shadow-black/20 flex items-center justify-between group overflow-hidden relative"
           >

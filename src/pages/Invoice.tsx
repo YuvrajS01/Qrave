@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Printer, Receipt } from 'lucide-react';
 import { api } from '../services/api';
-import { Order } from '../../types';
+import { Order } from '../types';
 import { Button } from '../../components/ui/Button';
 
 export const Invoice = () => {
@@ -54,7 +54,7 @@ export const Invoice = () => {
                         <div className="text-right">
                             <h2 className="text-4xl font-serif font-bold text-stone-200 mb-2">INVOICE</h2>
                             <p className="text-stone-500 font-mono text-sm">#{order.id.slice(0, 8).toUpperCase()}</p>
-                            <p className="text-stone-500 text-sm">{new Date(order.createdAt).toLocaleDateString()}</p>
+                            <p className="text-stone-500 text-sm">{new Date(order.timestamp).toLocaleDateString()}</p>
                         </div>
                     </div>
 
@@ -76,10 +76,10 @@ export const Invoice = () => {
                         <tbody className="divide-y divide-stone-50">
                             {order.items.map((item) => (
                                 <tr key={item.id}>
-                                    <td className="py-4 font-medium text-qrave-dark">{item.menuItem.name}</td>
+                                    <td className="py-4 font-medium text-qrave-dark">{item.name}</td>
                                     <td className="py-4 text-center text-stone-500">{item.quantity}</td>
-                                    <td className="py-4 text-right text-stone-500">${item.priceAtTime.toFixed(2)}</td>
-                                    <td className="py-4 text-right font-bold text-stone-700">${(item.priceAtTime * item.quantity).toFixed(2)}</td>
+                                    <td className="py-4 text-right text-stone-500">${item.price.toFixed(2)}</td>
+                                    <td className="py-4 text-right font-bold text-stone-700">${(item.price * item.quantity).toFixed(2)}</td>
                                 </tr>
                             ))}
                         </tbody>

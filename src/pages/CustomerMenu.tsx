@@ -5,8 +5,8 @@ import { MenuCard } from '../../components/customer/MenuCard';
 import { CartDrawer } from '../../components/customer/CartDrawer';
 import { useCart } from '../context/CartContext';
 import { api } from '../services/api';
-import * as db from '../../services/mockDb';
-import { Restaurant } from '../../types';
+import * as db from "../services/mockDb";
+import { Restaurant } from '../types';
 
 export const CustomerMenu = () => {
     const { slug } = useParams();

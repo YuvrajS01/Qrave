@@ -13,9 +13,9 @@ import {
 import { Button } from '../../components/ui/Button';
 import { OrderCard } from '../../components/admin/OrderCard';
 import { api } from '../services/api';
-import * as db from '../../services/mockDb';
-import * as gemini from '../../services/geminiService';
-import { Restaurant, OrderStatus, MenuItem } from '../../types';
+import * as db from '../services/mockDb';
+import * as gemini from '../services/geminiService';
+import { Restaurant, OrderStatus, MenuItem } from '../types';
 
 type AdminView = 'DASHBOARD' | 'MENU';
 

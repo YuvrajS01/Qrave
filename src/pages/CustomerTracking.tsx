@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
-import { Clock, ChefHat, CheckCircle, ArrowLeft, UtensilsCrossed } from 'lucide-react';
+import { Clock, ChefHat, CheckCircle, ArrowLeft, UtensilsCrossed, Receipt } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { api } from '../services/api';
-import * as db from '../../services/mockDb';
-import { Order, OrderStatus } from '../../types';
+import * as db from '../services/mockDb';
+import { Order, OrderStatus } from '../types';
 
 export const CustomerTracking = () => {
     const { slug, orderId } = useParams();
@@ -77,8 +77,8 @@ export const CustomerTracking = () => {
                         </div>
                         <div className="flex items-center gap-4">
                             <div className={`w-8 h-8 rounded-full flex items-center justify-center ${activeOrder.status === OrderStatus.PREPARING || activeOrder.status === OrderStatus.READY || activeOrder.status === OrderStatus.COMPLETED
-                                    ? 'bg-orange-500 text-white'
-                                    : 'bg-stone-200 text-stone-400'
+                                ? 'bg-orange-500 text-white'
+                                : 'bg-stone-200 text-stone-400'
                                 }`}>
                                 <ChefHat size={16} />
                             </div>
@@ -89,8 +89,8 @@ export const CustomerTracking = () => {
                         </div>
                         <div className="flex items-center gap-4">
                             <div className={`w-8 h-8 rounded-full flex items-center justify-center ${activeOrder.status === OrderStatus.READY || activeOrder.status === OrderStatus.COMPLETED
-                                    ? 'bg-green-500 text-white'
-                                    : 'bg-stone-200 text-stone-400'
+                                ? 'bg-green-500 text-white'
+                                : 'bg-stone-200 text-stone-400'
                                 }`}>
                                 <UtensilsCrossed size={16} />
                             </div>
@@ -104,6 +104,13 @@ export const CustomerTracking = () => {
                     <Button onClick={() => navigate(`/r/${slug}?table=${tableNumber}`)} variant="secondary" className="w-full py-4">
                         Order More Items
                     </Button>
+
+                    {(activeOrder.status === OrderStatus.READY || activeOrder.status === OrderStatus.COMPLETED) && (
+                        <Button onClick={() => navigate(`/r/${slug}/orders/${orderId}/invoice`)} variant="outline" className="w-full py-4 flex items-center justify-center gap-2">
+                            <Receipt size={20} />
+                            View Invoice
+                        </Button>
+                    )}
                 </div>
             </main>
         </div>
