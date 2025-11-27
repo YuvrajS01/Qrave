@@ -10,11 +10,13 @@ import {
     Edit2,
     X,
     QrCode,
-    Menu
+    Menu,
+    Plus
 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { OrderCard } from '../../components/admin/OrderCard';
 import { QRGenerator } from '../../components/admin/QRGenerator';
+import { MenuItemModal } from '../../components/admin/MenuItemModal';
 import { api } from '../services/api';
 import * as db from '../services/mockDb';
 
@@ -75,15 +77,44 @@ export const AdminDashboard = () => {
 
 
     const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
-    const handleUpdateItem = async () => {
+    const handleCreateItem = async (itemData: Partial<MenuItem>) => {
+        if (!restaurant) return;
+        // Ensure required fields are present or have defaults
+        const newItem = {
+            ...itemData,
+            name: itemData.name || 'New Item',
+            price: itemData.price || 0,
+            category: itemData.category || 'Mains',
+            available: itemData.available ?? true
+        } as MenuItem;
+
+        const success = await api.addMenuItem(newItem, restaurant.id);
+        if (success) {
+            // Re-fetch or update local state
+            // Since we don't get the ID back easily without a real backend response that includes it,
+            // and our mockDb generates it, we should ideally re-fetch.
+            // But api.addMenuItem returns boolean. Let's check api.ts again.
+            // api.addMenuItem returns boolean.
+            // Let's re-fetch the restaurant data to be safe and get the new ID.
+            const data = await api.getRestaurantBySlug(slug!);
+            if (data) {
+                const orders = await api.getOrders(data.id);
+                setRestaurant({ ...data, orders });
+            }
+            setIsCreateModalOpen(false);
+        }
+    };
+
+    const handleUpdateItem = async (itemData: Partial<MenuItem>) => {
         if (!editingItem || !restaurant) return;
 
-        const success = await api.updateMenuItem(editingItem.id, editingItem);
+        const success = await api.updateMenuItem(editingItem.id, itemData);
         if (success) {
             setRestaurant(prev => prev ? ({
                 ...prev,
-                menu: prev.menu.map(item => item.id === editingItem.id ? editingItem : item)
+                menu: prev.menu.map(item => item.id === editingItem.id ? { ...item, ...itemData } : item)
             }) : null);
             setEditingItem(null);
         }
@@ -191,6 +222,12 @@ export const AdminDashboard = () => {
                         </h2>
                     </div>
                     <div className="flex items-center gap-4">
+                        {view === 'MENU' && (
+                            <Button size="sm" onClick={() => setIsCreateModalOpen(true)} className="flex items-center gap-2">
+                                <Plus size={16} />
+                                Add Item
+                            </Button>
+                        )}
                         {view === 'DASHBOARD' && (
                             <Button variant="secondary" size="sm" onClick={handleClearCompleted} className="text-xs">
                                 Clear Completed
@@ -253,85 +290,19 @@ export const AdminDashboard = () => {
                 </div>
             </main >
 
-            {/* Edit Modal */}
-            {
-                editingItem && (
-                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                        <div className="bg-white rounded-2xl p-6 w-full max-w-md space-y-4">
-                            <div className="flex justify-between items-center">
-                                <h3 className="font-serif text-xl font-bold">Edit Item</h3>
-                                <button onClick={() => setEditingItem(null)} className="p-2 hover:bg-stone-100 rounded-full">
-                                    <X size={20} />
-                                </button>
-                            </div>
+            {/* Modals */}
+            <MenuItemModal
+                isOpen={isCreateModalOpen}
+                onClose={() => setIsCreateModalOpen(false)}
+                onSave={handleCreateItem}
+            />
 
-                            <div className="space-y-3">
-                                <div>
-                                    <label className="text-xs font-bold uppercase text-stone-400">Name</label>
-                                    <input
-                                        className="w-full p-2 bg-stone-50 rounded-lg border-none focus:ring-2 focus:ring-qrave-accent"
-                                        value={editingItem.name}
-                                        onChange={e => setEditingItem({ ...editingItem, name: e.target.value })}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="text-xs font-bold uppercase text-stone-400">Description</label>
-                                    <textarea
-                                        className="w-full p-2 bg-stone-50 rounded-lg border-none focus:ring-2 focus:ring-qrave-accent resize-none"
-                                        rows={3}
-                                        value={editingItem.description || ''}
-                                        onChange={e => setEditingItem({ ...editingItem, description: e.target.value })}
-                                    />
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="text-xs font-bold uppercase text-stone-400">Price</label>
-                                        <input
-                                            type="number"
-                                            className="w-full p-2 bg-stone-50 rounded-lg border-none focus:ring-2 focus:ring-qrave-accent"
-                                            value={editingItem.price}
-                                            onChange={e => setEditingItem({ ...editingItem, price: parseFloat(e.target.value) })}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="text-xs font-bold uppercase text-stone-400">Category</label>
-                                        <input
-                                            className="w-full p-2 bg-stone-50 rounded-lg border-none focus:ring-2 focus:ring-qrave-accent"
-                                            value={editingItem.category}
-                                            onChange={e => setEditingItem({ ...editingItem, category: e.target.value })}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="flex gap-4 pt-2">
-                                    <label className="flex items-center gap-2 cursor-pointer">
-                                        <input
-                                            type="checkbox"
-                                            checked={editingItem.isVegetarian}
-                                            onChange={e => setEditingItem({ ...editingItem, isVegetarian: e.target.checked })}
-                                            className="rounded text-qrave-accent focus:ring-qrave-accent"
-                                        />
-                                        <span className="text-sm font-medium">Vegetarian</span>
-                                    </label>
-                                    <label className="flex items-center gap-2 cursor-pointer">
-                                        <input
-                                            type="checkbox"
-                                            checked={editingItem.available}
-                                            onChange={e => setEditingItem({ ...editingItem, available: e.target.checked })}
-                                            className="rounded text-qrave-accent focus:ring-qrave-accent"
-                                        />
-                                        <span className="text-sm font-medium">Available</span>
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div className="flex gap-3 pt-4">
-                                <Button variant="secondary" onClick={() => setEditingItem(null)} className="flex-1">Cancel</Button>
-                                <Button onClick={handleUpdateItem} className="flex-1">Save Changes</Button>
-                            </div>
-                        </div>
-                    </div>
-                )
-            }
+            <MenuItemModal
+                isOpen={!!editingItem}
+                onClose={() => setEditingItem(null)}
+                onSave={handleUpdateItem}
+                initialData={editingItem}
+            />
         </div >
     );
 };

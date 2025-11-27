@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Html5QrcodeScanner, Html5QrcodeScanType, Html5QrcodeSupportedFormats } from 'html5-qrcode';
-import { X } from 'lucide-react';
+import { Html5QrcodeScanner, Html5QrcodeScanType, Html5QrcodeSupportedFormats, Html5Qrcode } from 'html5-qrcode';
+import { X, Upload } from 'lucide-react';
 import { Button } from './ui/Button';
 
 interface QRScannerProps {
@@ -11,6 +11,7 @@ interface QRScannerProps {
 
 export const QRScanner: React.FC<QRScannerProps> = ({ onScanSuccess, onScanFailure, onClose }) => {
     const scannerRef = useRef<Html5QrcodeScanner | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
     const [scanError, setScanError] = useState<string | null>(null);
 
     useEffect(() => {
@@ -56,6 +57,28 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onScanSuccess, onScanFailu
         };
     }, [onScanSuccess, onScanFailure]);
 
+    const handleUploadClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        try {
+            const html5QrCode = new Html5Qrcode("qr-file-reader");
+            const decodedText = await html5QrCode.scanFile(file, true);
+            onScanSuccess(decodedText, { result: { text: decodedText } });
+            html5QrCode.clear();
+        } catch (err) {
+            console.error("Error scanning file", err);
+            setScanError("Could not scan QR code from image.");
+            if (onScanFailure) {
+                onScanFailure(err);
+            }
+        }
+    };
+
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden relative animate-in fade-in zoom-in duration-300">
@@ -71,9 +94,32 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onScanSuccess, onScanFailu
 
                 <div className="p-6">
                     <div id="reader" className="w-full overflow-hidden rounded-xl border-2 border-dashed border-stone-200"></div>
-                    <p className="text-center text-sm text-stone-500 mt-4">
-                        Point your camera at a Qrave QR code to view the menu.
-                    </p>
+                    <div id="qr-file-reader" className="hidden"></div>
+
+                    <div className="mt-6 flex flex-col items-center gap-3">
+                        <p className="text-center text-sm text-stone-500">
+                            Point your camera at a Qrave QR code
+                        </p>
+                        <div className="flex items-center gap-2 w-full">
+                            <div className="h-px bg-stone-200 flex-1"></div>
+                            <span className="text-xs text-stone-400 font-medium uppercase">Or</span>
+                            <div className="h-px bg-stone-200 flex-1"></div>
+                        </div>
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            className="hidden"
+                            accept="image/*"
+                            onChange={handleFileChange}
+                        />
+                        <Button variant="outline" onClick={handleUploadClick} className="w-full flex items-center justify-center gap-2">
+                            <Upload size={18} />
+                            Upload QR Image
+                        </Button>
+                        {scanError && (
+                            <p className="text-xs text-red-500 font-medium">{scanError}</p>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>
