@@ -10,7 +10,6 @@
     "server": "tsx watch server/index.ts"
   },
   "dependencies": {
-    "@google/genai": "^1.30.0",
     "@prisma/client": "^6.19.0",
     "@supabase/supabase-js": "^2.84.0",
     "cors": "^2.8.5",

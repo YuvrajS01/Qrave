@@ -183,6 +183,52 @@ app.patch('/api/orders/:id/status', async (req, res) => {
     }
 });
 
+// Delete All Completed/Cancelled Orders for a Restaurant
+app.delete('/api/orders/completed', async (req, res) => {
+    try {
+        const { restaurantId } = req.query;
+        console.log(`[DELETE /api/orders/completed] Request received for restaurantId: ${restaurantId}`);
+
+        if (!restaurantId) {
+            console.error('[DELETE /api/orders/completed] Missing restaurantId');
+            return res.status(400).json({ error: 'Missing restaurantId' });
+        }
+
+        const count = await prisma.order.count({
+            where: {
+                restaurantId: String(restaurantId),
+                status: { in: ['COMPLETED', 'CANCELLED'] }
+            }
+        });
+        console.log(`[DELETE /api/orders/completed] Found ${count} orders to delete`);
+
+        const result = await prisma.order.deleteMany({
+            where: {
+                restaurantId: String(restaurantId),
+                status: { in: ['COMPLETED', 'CANCELLED'] }
+            }
+        });
+        console.log(`[DELETE /api/orders/completed] Deleted ${result.count} orders`);
+
+        res.json({ success: true, count: result.count });
+    } catch (error) {
+        console.error('[DELETE /api/orders/completed] Error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Delete Single Order
+app.delete('/api/orders/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        await prisma.order.delete({ where: { id } });
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 // Add Menu Item
 app.post('/api/menu-items', async (req, res) => {
     try {

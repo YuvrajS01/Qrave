@@ -5,9 +5,10 @@ import { Clock, CheckCircle2, ChefHat, XCircle } from 'lucide-react';
 interface OrderCardProps {
   order: Order;
   onStatusChange: (orderId: string, status: OrderStatus) => void;
+  onDelete: (orderId: string) => void;
 }
 
-export const OrderCard: React.FC<OrderCardProps> = ({ order, onStatusChange }) => {
+export const OrderCard: React.FC<OrderCardProps> = ({ order, onStatusChange, onDelete }) => {
   const statusColors = {
     [OrderStatus.PENDING]: 'bg-yellow-100 text-yellow-800 border-yellow-200',
     [OrderStatus.PREPARING]: 'bg-blue-100 text-blue-800 border-blue-200',
@@ -40,9 +41,20 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order, onStatusChange }) =
             #{order.id.slice(-4)} • {new Date(order.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
           </span>
         </div>
-        <span className={`px-2 py-1 rounded text-xs font-bold uppercase tracking-wide border ${statusColors[order.status]}`}>
-          {order.status}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className={`px-2 py-1 rounded text-xs font-bold uppercase tracking-wide border ${statusColors[order.status]}`}>
+            {order.status}
+          </span>
+          {(order.status === OrderStatus.COMPLETED || order.status === OrderStatus.CANCELLED) && (
+            <button
+              onClick={() => onDelete(order.id)}
+              className="p-1 text-stone-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
+              title="Delete Order"
+            >
+              <XCircle size={16} />
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="space-y-2 border-t border-b border-stone-100 py-3 my-1">

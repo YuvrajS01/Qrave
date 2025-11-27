@@ -213,6 +213,30 @@ export const api = {
         }
     },
 
+    deleteOrder: async (orderId: string): Promise<boolean> => {
+        try {
+            const res = await fetch(`${API_URL}/orders/${orderId}`, {
+                method: 'DELETE'
+            });
+            return res.ok;
+        } catch (e) {
+            console.error(e);
+            return false;
+        }
+    },
+
+    deleteCompletedOrders: async (restaurantId: string): Promise<boolean> => {
+        try {
+            const res = await fetch(`${API_URL}/orders/completed?restaurantId=${restaurantId}`, {
+                method: 'DELETE'
+            });
+            return res.ok;
+        } catch (e) {
+            console.error(e);
+            return false;
+        }
+    },
+
     addMenuItem: async (item: MenuItem, restaurantId: string): Promise<boolean> => {
         try {
             const res = await fetch(`${API_URL}/menu-items`, {
