@@ -5,7 +5,9 @@ import { Landing } from './src/pages/Landing';
 import { CustomerMenu } from './src/pages/CustomerMenu';
 import { CustomerCheckout } from './src/pages/CustomerCheckout';
 import { CustomerTracking } from './src/pages/CustomerTracking';
+import { Login } from './src/pages/Login';
 import { AdminDashboard } from './src/pages/AdminDashboard';
+import { SuperAdmin } from './src/pages/SuperAdmin';
 import { Invoice } from './src/pages/Invoice';
 
 const App: React.FC = () => {
@@ -18,7 +20,9 @@ const App: React.FC = () => {
           <Route path="/r/:slug/checkout" element={<CustomerCheckout />} />
           <Route path="/r/:slug/orders/:orderId" element={<CustomerTracking />} />
           <Route path="/r/:slug/orders/:orderId/invoice" element={<Invoice />} />
-          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/admin/:slug" element={<AdminDashboard />} />
+          <Route path="/super-admin" element={<SuperAdmin />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>

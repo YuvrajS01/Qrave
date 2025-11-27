@@ -47,7 +47,7 @@ export const Landing = () => {
 
                 <p className="mt-8 text-xs text-stone-400 font-sans">
                     Are you a restaurant owner? <br />
-                    <span className="underline cursor-pointer hover:text-qrave-dark transition-colors" onClick={() => navigate('/admin')}>Login to Dashboard</span>
+                    <span className="underline cursor-pointer hover:text-qrave-dark transition-colors" onClick={() => navigate('/login')}>Login to Dashboard</span>
                 </p>
             </motion.div>
         </div>

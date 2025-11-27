@@ -5,6 +5,60 @@ const API_URL = 'http://localhost:3001/api';
 // --- API Methods ---
 
 export const api = {
+    getRestaurants: async () => {
+        try {
+            const res = await fetch(`${API_URL}/restaurants`);
+            if (!res.ok) throw new Error('Failed to fetch restaurants');
+            return await res.json();
+        } catch (error) {
+            console.error(error);
+            return [];
+        }
+    },
+
+    createRestaurant: async (data: { name: string, slug: string, password?: string }) => {
+        try {
+            const res = await fetch(`${API_URL}/restaurants`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            if (!res.ok) throw new Error('Failed to create restaurant');
+            return await res.json();
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
+    },
+
+    login: async (slug: string, password: string) => {
+        try {
+            const res = await fetch(`${API_URL}/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ slug, password })
+            });
+            if (!res.ok) throw new Error('Login failed');
+            return await res.json();
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
+    },
+
+    deleteRestaurant: async (id: string) => {
+        try {
+            const res = await fetch(`${API_URL}/restaurants/${id}`, {
+                method: 'DELETE'
+            });
+            if (!res.ok) throw new Error('Failed to delete restaurant');
+            return true;
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
+    },
+
     getRestaurantBySlug: async (slug: string): Promise<Restaurant | null> => {
         try {
             const res = await fetch(`${API_URL}/restaurants/${slug}`);

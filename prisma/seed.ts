@@ -10,6 +10,7 @@ async function main() {
         create: {
             slug: 'demo-restaurant',
             name: 'The Obsidian Fork',
+            password: 'password',
             menu: {
                 create: [
                     {

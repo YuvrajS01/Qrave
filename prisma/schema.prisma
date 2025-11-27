@@ -11,6 +11,7 @@ model Restaurant {
   id        String     @id @default(uuid())
   slug      String     @unique
   name      String
+  password  String     @default("password")
   createdAt DateTime   @default(now())
   menu      MenuItem[]
   orders    Order[]

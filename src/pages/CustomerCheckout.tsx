@@ -102,7 +102,7 @@ export const CustomerCheckout = () => {
 
             <div className="p-6 border-t border-stone-100">
                 <Button onClick={placeOrder} size="lg" className="w-full flex items-center justify-between group">
-                    <span>Pay with Razorpay</span>
+                    <span>Pay</span>
                     <div className="flex items-center gap-2">
                         <span className="font-mono text-white/80">₹{(total * 1.05).toFixed(2)}</span>
                         <CreditCard size={20} className="group-hover:translate-x-1 transition-transform" />

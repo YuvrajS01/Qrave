@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
     ChefHat,
     LayoutDashboard,
@@ -21,6 +21,7 @@ type AdminView = 'DASHBOARD' | 'MENU';
 
 export const AdminDashboard = () => {
     const navigate = useNavigate();
+    const { slug } = useParams<{ slug: string }>();
     const [view, setView] = useState<AdminView>('DASHBOARD');
     const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
 
@@ -30,16 +31,19 @@ export const AdminDashboard = () => {
 
     useEffect(() => {
         const fetchRestaurantData = async () => {
-            // For MVP, hardcode slug. In real app, get from auth context.
-            const data = await api.getRestaurantBySlug('demo-restaurant');
+            if (!slug) return;
+            const data = await api.getRestaurantBySlug(slug);
             if (data) {
                 // Fetch orders separately
                 const orders = await api.getOrders(data.id);
                 setRestaurant({ ...data, orders });
+            } else {
+                // Handle invalid slug or unauthorized
+                navigate('/login');
             }
         };
         fetchRestaurantData();
-    }, []);
+    }, [slug, navigate]);
 
     // Realtime Orders
     useEffect(() => {
@@ -81,10 +85,12 @@ export const AdminDashboard = () => {
             const success = await api.addMenuItem(newItem, restaurant.id);
             if (success) {
                 // Refresh menu
-                const updated = await api.getRestaurantBySlug('demo-restaurant');
-                if (updated) {
-                    // Keep existing orders
-                    setRestaurant(prev => prev ? ({ ...prev, menu: updated.menu }) : null);
+                if (slug) {
+                    const updated = await api.getRestaurantBySlug(slug);
+                    if (updated) {
+                        // Keep existing orders
+                        setRestaurant(prev => prev ? ({ ...prev, menu: updated.menu }) : null);
+                    }
                 }
                 setNewItemName('');
             }

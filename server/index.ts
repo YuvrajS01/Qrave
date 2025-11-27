@@ -9,6 +9,72 @@ const PORT = 3001;
 app.use(cors());
 app.use(express.json());
 
+// Get All Restaurants
+app.get('/api/restaurants', async (req, res) => {
+    try {
+        const restaurants = await prisma.restaurant.findMany({
+            include: { _count: { select: { orders: true, menu: true } } }
+        });
+        // Remove passwords from response
+        const safeRestaurants = restaurants.map(({ password, ...rest }) => rest);
+        res.json(safeRestaurants);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Create Restaurant
+app.post('/api/restaurants', async (req, res) => {
+    try {
+        const { name, slug, password } = req.body;
+        const restaurant = await prisma.restaurant.create({
+            data: {
+                name,
+                slug,
+                password: password || 'password' // Default password if not provided
+            }
+        });
+        const { password: _, ...safeRestaurant } = restaurant;
+        res.json(safeRestaurant);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Login
+app.post('/api/login', async (req, res) => {
+    try {
+        const { slug, password } = req.body;
+        const restaurant = await prisma.restaurant.findUnique({
+            where: { slug }
+        });
+
+        if (!restaurant || restaurant.password !== password) {
+            return res.status(401).json({ error: 'Invalid credentials' });
+        }
+
+        const { password: _, ...safeRestaurant } = restaurant;
+        res.json(safeRestaurant);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Delete Restaurant
+app.delete('/api/restaurants/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        await prisma.restaurant.delete({ where: { id } });
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 // Get Restaurant by Slug
 app.get('/api/restaurants/:slug', async (req, res) => {
     try {
