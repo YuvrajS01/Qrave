@@ -101,8 +101,8 @@ npm run server
 npm run dev
 ```
 
-- **Customer App**: [http://localhost:5173](http://localhost:5173)
-- **Admin Dashboard**: [http://localhost:5173/admin](http://localhost:5173/admin)
+- **Customer App**: [http://localhost:3000](http://localhost:3000)
+- **Admin Dashboard**: [http://localhost:3000/login](http://localhost:3000/login)
 
 > **Note**: Default Admin Credentials
 > - **Slug**: `demo-restaurant`
