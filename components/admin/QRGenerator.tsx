@@ -87,12 +87,10 @@ export const QRGenerator: React.FC<QRGeneratorProps> = ({ slug }) => {
                             type="text"
                             value={tableInput}
                             onChange={(e) => setTableInput(e.target.value)}
-                            placeholder="e.g. 1, 2, 5-10"
+                            placeholder="Enter single numbers separated by commas, or ranges with a hyphen."
                             className="w-full p-3 bg-stone-50 rounded-lg border-none focus:ring-2 focus:ring-qrave-accent"
                         />
-                        <p className="text-xs text-stone-400 mt-2">
-                            Enter single numbers separated by commas, or ranges with a hyphen.
-                        </p>
+
                     </div>
                     <Button onClick={handleGenerate}>Generate</Button>
                 </div>

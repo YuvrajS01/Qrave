@@ -34,7 +34,7 @@ export const CustomerMenu = () => {
     const categories = db.getMenuByCategory(restaurant.menu); // Changed from db.getMenuByCategory to api.getMenuByCategory
 
     return (
-        <div className="min-h-screen bg-qrave-base pb-32">
+        <div className="pb-32">
             <header className="sticky top-0 z-40 bg-qrave-base/95 backdrop-blur-md px-4 md:px-6 py-4 border-b border-stone-200/50 flex justify-between items-center transition-all duration-300">
                 <div className="flex items-center gap-3">
                     <button onClick={() => navigate('/')} className="p-2 -ml-2 hover:bg-black/5 rounded-full transition-colors">

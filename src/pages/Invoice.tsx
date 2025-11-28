@@ -27,7 +27,7 @@ export const Invoice = () => {
     const total = subtotal + tax;
 
     return (
-        <div className="min-h-screen bg-stone-100 p-4 md:p-8 flex justify-center">
+        <div className="min-h-screen p-4 md:p-8 flex justify-center">
             <div className="bg-white w-full max-w-2xl shadow-lg rounded-xl overflow-hidden flex flex-col">
                 {/* Header - Hidden in Print */}
                 <div className="bg-qrave-dark text-white p-4 flex justify-between items-center print:hidden">
@@ -35,7 +35,7 @@ export const Invoice = () => {
                         <ArrowLeft size={16} /> Back
                     </button>
                     <h1 className="font-serif font-bold text-lg">Invoice Preview</h1>
-                    <Button onClick={() => window.print()} className="flex items-center gap-2 bg-white text-qrave-dark hover:bg-stone-200">
+                    <Button onClick={() => window.print()} variant="secondary" className="flex items-center gap-2">
                         <Printer size={16} /> Print
                     </Button>
                 </div>

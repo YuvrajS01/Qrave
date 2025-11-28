@@ -59,7 +59,7 @@ export const SuperAdmin = () => {
     };
 
     return (
-        <div className="min-h-screen bg-stone-50 p-8">
+        <div className="min-h-screen p-8">
             <div className="max-w-5xl mx-auto">
                 <header className="flex justify-between items-center mb-12">
                     <div>

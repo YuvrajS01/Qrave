@@ -55,9 +55,8 @@ export const Landing = () => {
     };
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden bg-qrave-base">
-            {/* Background Decor */}
-            <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-orange-400 via-transparent to-transparent"></div>
+        <div className="min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden">
+
 
             <motion.div
                 initial={{ scale: 0.9, opacity: 0 }}

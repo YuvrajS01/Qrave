@@ -45,7 +45,7 @@ export const CustomerCheckout = () => {
     const total = cartTotal;
 
     return (
-        <div className="min-h-screen bg-white flex flex-col">
+        <div className="min-h-screen flex flex-col">
             <header className="px-4 md:px-6 py-4 border-b border-stone-100 flex items-center gap-4 sticky top-0 bg-white z-30">
                 <button onClick={() => navigate(-1)} className="p-2 -ml-2 hover:bg-stone-50 rounded-full transition-colors">
                     <ArrowLeft size={24} className="text-qrave-dark" />

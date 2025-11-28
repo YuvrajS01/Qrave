@@ -167,7 +167,7 @@ export const AdminDashboard = () => {
     }
 
     return (
-        <div className="min-h-screen bg-stone-50 flex">
+        <div className="min-h-screen flex">
             {/* Sidebar */}
             <aside className={`${isSidebarOpen ? 'w-64 p-6' : 'w-0 p-0 overflow-hidden'} bg-qrave-dark text-white transition-all duration-300 flex flex-col justify-between whitespace-nowrap`}>
                 <div>

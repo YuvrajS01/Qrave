@@ -37,7 +37,7 @@ export const Login = () => {
     };
 
     return (
-        <div className="min-h-screen bg-stone-50 flex items-center justify-center p-4">
+        <div className="min-h-screen flex items-center justify-center p-4">
             <div className="bg-white p-8 rounded-2xl shadow-xl shadow-stone-200/50 w-full max-w-md border border-stone-100">
                 <div className="text-center mb-8">
                     <div className="w-16 h-16 bg-qrave-dark text-white rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-stone-300">
