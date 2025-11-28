@@ -11,7 +11,8 @@ import {
     X,
     QrCode,
     Menu,
-    Plus
+    Plus,
+    Settings
 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { OrderCard } from '../../components/admin/OrderCard';
@@ -22,7 +23,7 @@ import * as db from '../services/mockDb';
 
 import { Restaurant, OrderStatus, MenuItem } from '../types';
 
-type AdminView = 'DASHBOARD' | 'MENU' | 'QR_CODES';
+type AdminView = 'DASHBOARD' | 'MENU' | 'QR_CODES' | 'SETTINGS';
 
 export const AdminDashboard = () => {
     const navigate = useNavigate();
@@ -158,6 +159,28 @@ export const AdminDashboard = () => {
         return statusWeight[a.status] - statusWeight[b.status] || b.timestamp - a.timestamp;
     }) : [];
 
+    const [settingsForm, setSettingsForm] = useState({ name: '', address: '' });
+
+    useEffect(() => {
+        if (restaurant) {
+            setSettingsForm({
+                name: restaurant.name,
+                address: restaurant.address || ''
+            });
+        }
+    }, [restaurant?.id, restaurant?.name, restaurant?.address]);
+
+    const handleUpdateSettings = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!restaurant) return;
+
+        const updated = await api.updateRestaurant(restaurant.id, settingsForm);
+        if (updated) {
+            setRestaurant(prev => prev ? ({ ...prev, ...updated }) : null);
+            alert('Settings updated successfully!');
+        }
+    };
+
     if (!restaurant) {
         return (
             <div className="min-h-screen bg-stone-50 flex items-center justify-center">
@@ -199,6 +222,13 @@ export const AdminDashboard = () => {
                             <QrCode size={20} />
                             <span className="font-sans text-sm font-medium">QR Codes</span>
                         </button>
+                        <button
+                            onClick={() => setView('SETTINGS')}
+                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${view === 'SETTINGS' ? 'bg-white/10 text-white' : 'text-stone-400 hover:text-white'}`}
+                        >
+                            <Settings size={20} />
+                            <span className="font-sans text-sm font-medium">Settings</span>
+                        </button>
                     </nav>
                 </div>
                 <button
@@ -218,7 +248,7 @@ export const AdminDashboard = () => {
                             <Menu size={20} className="text-stone-500" />
                         </button>
                         <h2 className="font-serif text-2xl font-bold text-qrave-dark">
-                            {view === 'DASHBOARD' ? 'Kitchen Display System' : view === 'MENU' ? 'Menu Management' : 'QR Code Generator'}
+                            {view === 'DASHBOARD' ? 'Kitchen Display System' : view === 'MENU' ? 'Menu Management' : view === 'QR_CODES' ? 'QR Code Generator' : 'Restaurant Settings'}
                         </h2>
                     </div>
                     <div className="flex items-center gap-4">
@@ -284,8 +314,35 @@ export const AdminDashboard = () => {
                                 </div>
                             ))}
                         </div>
-                    ) : (
+                    ) : view === 'QR_CODES' ? (
                         <QRGenerator slug={slug || ''} />
+                    ) : (
+                        <div className="max-w-2xl bg-white p-8 rounded-xl shadow-sm border border-stone-200">
+                            <form onSubmit={handleUpdateSettings} className="space-y-6">
+                                <div>
+                                    <label className="block text-sm font-medium text-stone-700 mb-2">Restaurant Name</label>
+                                    <input
+                                        type="text"
+                                        value={settingsForm.name}
+                                        onChange={(e) => setSettingsForm({ ...settingsForm, name: e.target.value })}
+                                        className="w-full px-4 py-2 rounded-lg border border-stone-200 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-stone-700 mb-2">Address (for Invoices)</label>
+                                    <textarea
+                                        value={settingsForm.address}
+                                        onChange={(e) => setSettingsForm({ ...settingsForm, address: e.target.value })}
+                                        className="w-full px-4 py-2 rounded-lg border border-stone-200 focus:outline-none focus:ring-2 focus:ring-orange-500 h-32"
+                                        placeholder="Enter full address..."
+                                    />
+                                </div>
+                                <div className="flex justify-end">
+                                    <Button type="submit">Save Changes</Button>
+                                </div>
+                            </form>
+                        </div>
                     )}
                 </div>
             </main >

@@ -30,20 +30,22 @@ export interface Order {
   status: OrderStatus;
   timestamp: number;
   customerNote?: string;
+  restaurant?: Restaurant;
 }
 
 export interface Restaurant {
   id: string;
   name: string;
+  address?: string;
   menu: MenuItem[];
   orders: Order[];
   tables: number;
 }
 
-export type ViewState = 
-  | 'LANDING' 
-  | 'CUSTOMER_MENU' 
-  | 'CUSTOMER_CHECKOUT' 
-  | 'CUSTOMER_TRACKING' 
+export type ViewState =
+  | 'LANDING'
+  | 'CUSTOMER_MENU'
+  | 'CUSTOMER_CHECKOUT'
+  | 'CUSTOMER_TRACKING'
   | 'ADMIN_DASHBOARD'
   | 'ADMIN_MENU';

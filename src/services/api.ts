@@ -59,6 +59,21 @@ export const api = {
         }
     },
 
+    updateRestaurant: async (id: string, data: Partial<Restaurant>) => {
+        try {
+            const res = await fetch(`${API_URL}/restaurants/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            if (!res.ok) throw new Error('Failed to update restaurant');
+            return await res.json();
+        } catch (error) {
+            console.error(error);
+            return null;
+        }
+    },
+
     getRestaurantBySlug: async (slug: string): Promise<Restaurant | null> => {
         try {
             const res = await fetch(`${API_URL}/restaurants/${slug}`);
@@ -82,6 +97,7 @@ export const api = {
             return {
                 id: data.id,
                 name: data.name,
+                address: data.address,
                 menu,
                 orders: [], // Fetched separately
                 tables: 0
@@ -142,7 +158,15 @@ export const api = {
                 total: order.total,
                 status: order.status as OrderStatus,
                 timestamp: new Date(order.createdAt).getTime(),
-                customerNote: order.customerNote
+                customerNote: order.customerNote,
+                restaurant: order.restaurant ? {
+                    id: order.restaurant.id,
+                    name: order.restaurant.name,
+                    address: order.restaurant.address,
+                    menu: [], // Not needed here
+                    orders: [],
+                    tables: 0
+                } : undefined
             };
         } catch (e) {
             console.error(e);

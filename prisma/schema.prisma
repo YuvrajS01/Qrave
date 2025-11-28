@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -11,6 +11,7 @@ model Restaurant {
   id        String     @id @default(uuid())
   slug      String     @unique
   name      String
+  address   String?
   password  String     @default("password")
   createdAt DateTime   @default(now())
   menu      MenuItem[]

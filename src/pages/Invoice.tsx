@@ -48,8 +48,9 @@ export const Invoice = () => {
                                 <Receipt size={24} />
                                 <span className="font-serif text-2xl font-bold tracking-tight">Qrave</span>
                             </div>
-                            <p className="text-stone-500 text-sm">123 Food Street, Indiranagar</p>
-                            <p className="text-stone-500 text-sm">Bangalore, KA 560038</p>
+                            <p className="text-stone-500 text-sm whitespace-pre-line">
+                                {order.restaurant?.address || 'Address not available'}
+                            </p>
                         </div>
                         <div className="text-right">
                             <h2 className="text-4xl font-serif font-bold text-grey-200 mb-2">INVOICE</h2>

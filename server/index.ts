@@ -35,11 +35,12 @@ app.get('/api/restaurants', async (req, res) => {
 // Create Restaurant
 app.post('/api/restaurants', async (req, res) => {
     try {
-        const { name, slug, password } = req.body;
+        const { name, slug, password, address } = req.body;
         const restaurant = await prisma.restaurant.create({
             data: {
                 name,
                 slug,
+                address: address || 'Default Address', // Default empty address if not provided
                 password: password || 'password' // Default password if not provided
             }
         });
@@ -103,6 +104,25 @@ app.get('/api/restaurants/:slug', async (req, res) => {
     }
 });
 
+// Update Restaurant Details
+app.put('/api/restaurants/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, address } = req.body;
+
+        const restaurant = await prisma.restaurant.update({
+            where: { id },
+            data: { name, address }
+        });
+
+        const { password: _, ...safeRestaurant } = restaurant;
+        res.json(safeRestaurant);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 // Get Orders for Restaurant
 app.get('/api/orders', async (req, res) => {
     try {
@@ -159,7 +179,10 @@ app.get('/api/orders/:id', async (req, res) => {
         const { id } = req.params;
         const order = await prisma.order.findUnique({
             where: { id },
-            include: { items: { include: { menuItem: true } } }
+            include: {
+                items: { include: { menuItem: true } },
+                restaurant: true
+            }
         });
 
         if (!order) {
