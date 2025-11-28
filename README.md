@@ -1,18 +1,36 @@
-# Qrave – Modern Dine‑In Experience 🍽️
+# Qrave – Modern Dine-In Experience 🍽️
 
-> **A sleek, full‑stack restaurant app** that lets customers browse menus, place orders, track them in real‑time, and receive printable invoices – all powered by a **local SQLite + Express backend** and a **React Vite frontend**.
+![Qrave Landing Page](docs/assets/customer_landing.png)
+
+> **A sleek, full-stack restaurant application** that redefines the dine-in experience. Customers browse menus, place orders, and track them in real-time—all through a stunning, mobile-first interface. Powered by a robust **local SQLite + Express backend** and a **React Vite frontend**.
 
 ---
 
-## ✨ Highlights
+## ✨ Features
 
-- **Dynamic Menu Management** – Admins can add, edit, and remove items on the fly.
-- **Live Order Tracking** – Real‑time updates (via polling) keep diners in the loop.
-- **Printable Invoices** – Beautiful, printer‑friendly receipts with tax calculations.
-- **Mobile‑First Design** – Responsive UI with elegant glass‑morphism, dark mode, and smooth micro‑animations.
-- **Local‑Only Stack** – No cloud dependencies; run everything locally with SQLite.
-- **Type‑Safe Prisma ORM** – Strong typing for all DB interactions.
-- **Extensible Architecture** – Easy to swap Supabase for other backends.
+### 📱 For Customers
+- **Interactive Menu**: Browse dishes with beautiful visuals and detailed descriptions.
+- **Real-Time Tracking**: Watch your order status update live from "Pending" to "Served".
+- **Seamless Checkout**: Easy cart management and order placement.
+- **Mobile-First Design**: Optimized for any device with glassmorphism aesthetics and smooth animations.
+
+### 👨‍🍳 For Restaurants (Admin)
+- **Dynamic Dashboard**: Manage orders and menu items effortlessly.
+- **Live Order Management**: Accept, prepare, and serve orders with a single click.
+- **Menu Control**: Add, edit, or remove dishes instantly.
+- **Printable Invoices**: Generate professional, tax-ready receipts.
+
+---
+
+## 📸 See it in Action
+
+### Customer Menu
+Browse a rich, visual menu with category filtering and instant search.
+![Customer Menu](docs/assets/customer_menu.png)
+
+### Admin Dashboard
+*Manage your restaurant's operations from a centralized hub.*
+![Admin Login](docs/assets/admin_login.png)
 
 ---
 
@@ -20,69 +38,75 @@
 
 | Layer | Technology |
 |-------|------------|
-| **Frontend** | React 18, Vite, TypeScript, Tailwind‑like custom CSS, **lucide‑react** icons |
-| **Backend** | Express 4, TypeScript, **tsx**, **Prisma** (SQLite) |
-| **Database** | SQLite (file‑based) |
-| **Styling** | Vanilla CSS with modern design tokens (dark mode, gradients, glassmorphism) |
-| **Testing** | Manual UI testing + Vite dev server |
+| **Frontend** | React 18, Vite, TypeScript, Lucide React, Framer Motion |
+| **Backend** | Express 5, TypeScript, Prisma ORM |
+| **Database** | SQLite (Local file-based) |
+| **Styling** | Modern CSS (Glassmorphism, Dark Mode, Gradients) |
 
 ---
 
 ## 🚀 Getting Started
 
-### Prerequisites
+Follow these steps to get Qrave running locally in minutes.
 
-- **Node.js** ≥ 20 (recommended)
-- **npm** (comes with Node)
+### Prerequisites
+- **Node.js** ≥ 20
+- **npm** (included with Node)
 
 ### Installation
 
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/YuvrajS01/Qrave.git
+   cd Qrave
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Configure Environment**
+   Create a `.env` file in the root directory:
+   ```env
+   # Server
+   PORT=3001
+   DATABASE_URL=file:./prisma/dev.db
+
+   # Frontend
+   VITE_API_URL=http://localhost:3001/api
+   ```
+
+4. **Initialize Database**
+   ```bash
+   # Generate Prisma client and push schema
+   npx prisma generate
+   npx prisma db push
+
+   # Seed demo data
+   npx tsx prisma/seed.ts
+   ```
+
+### Running the App
+
+You can run both the backend and frontend with a single command (if configured) or separately:
+
+**Backend (Express)**
 ```bash
-# Clone the repo
-git clone https://github.com/YuvrajS01/Qrave.git
-cd Qrave
-
-# Install dependencies
-npm install
-```
-
-### Environment Variables
-
-Create a `.env` at the project root:
-
-```dotenv
-# Server
-PORT=3001
-DATABASE_URL=file:./prisma/dev.db
-
-# Frontend (Vite)
-VITE_API_URL=http://localhost:3001/api
-```
-
-> **Note:** The app no longer requires Supabase keys – it runs entirely locally.
-
-### Initialise the Database
-
-```bash
-# Generate Prisma client & push schema
-npx prisma generate
-npx prisma db push
-
-# Seed demo data (restaurant, menu items)
-npx tsx prisma/seed.ts
-```
-
-### Run the Application
-
-```bash
-# Start the backend (Express)
 npm run server
+```
 
-# In a new terminal, start the frontend (Vite)
+**Frontend (Vite)**
+```bash
 npm run dev
 ```
 
-Open <http://localhost:5173> in your browser. The admin dashboard is reachable at <http://localhost:5173/admin>.
+- **Customer App**: [http://localhost:5173](http://localhost:5173)
+- **Admin Dashboard**: [http://localhost:5173/admin](http://localhost:5173/admin)
+
+> **Note**: Default Admin Credentials
+> - **Slug**: `demo-restaurant`
+> - **Password**: `password`
 
 ---
 
@@ -90,53 +114,28 @@ Open <http://localhost:5173> in your browser. The admin dashboard is reachable a
 
 | Script | Description |
 |--------|-------------|
-| `dev` | Starts Vite dev server |
-| `build` | Bundles the app for production |
-| `preview` | Serves the production build |
-| `server` | Launches the Express backend via `tsx watch` |
-| `prisma:generate` | Generates Prisma client |
-| `prisma:push` | Pushes schema to SQLite |
-| `seed` | Seeds demo data |
-
----
-
-## 🔗 API Endpoints (Express)
-
-| Method | Path | Description |
-|--------|------|-------------|
-| `GET` | `/api/restaurants/:slug` | Fetch restaurant + menu |
-| `GET` | `/api/orders?restaurantId=…` | List orders for a restaurant |
-| `POST` | `/api/orders` | Create a new order |
-| `GET` | `/api/orders/:id` | Retrieve a single order |
-| `PATCH` | `/api/orders/:id/status` | Update order status |
-| `POST` | `/api/menu-items` | Add a new menu item |
-| `PUT` | `/api/menu-items/:id` | **New** – Edit an existing menu item |
-
----
-
-## 🎨 Design Philosophy
-
-- **Premium Aesthetics** – Vibrant gradients, glass‑morphism cards, and subtle hover animations.
-- **Responsive Layouts** – Mobile‑first breakpoints, grid‑based menu, and flexible containers.
-- **Accessibility** – Semantic HTML, focus states, and ARIA‑friendly components.
+| `npm run dev` | Starts the Vite development server |
+| `npm run server` | Starts the Express backend with watch mode |
+| `npm run build` | Builds the frontend for production |
+| `npm run preview` | Previews the production build |
 
 ---
 
 ## 🤝 Contributing
 
-1. Fork the repository.
-2. Create a feature branch (`git checkout -b feat/awesome-feature`).
-3. Commit your changes (`git commit -m "feat: add awesome feature"`).
-4. Push to your fork and open a Pull Request.
-
-Please ensure your code follows the existing TypeScript conventions and passes linting (`npm run lint`).
+Contributions are welcome! Please follow these steps:
+1. Fork the project.
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`).
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`).
+4. Push to the branch (`git push origin feature/AmazingFeature`).
+5. Open a Pull Request.
 
 ---
 
 ## 📄 License
 
-MIT © 2025 Yuvraj S.
+Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
 
-*Happy coding, and enjoy the modern dine‑in experience with Qrave!*
+*Built with ❤️ by Yuvraj S.*
